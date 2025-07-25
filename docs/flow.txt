@@ -1,0 +1,73 @@
+Para arrancar el desarrollo de **ft\_traceroute** aprovechando tu base de **ft\_ping**, podemos estructurar el análisis en dos bloques:
+
+---
+
+## 1. ¿Qué podemos reutilizar de ft\_ping?
+
+1. **Parseo de argumentos**
+
+   * El módulo `parse_args.c` ya gestiona `--help` y valida la presencia de un único parámetro (host/IP). Basta adaptarlo para que, en lugar de “nº de paquetes” o flags de ping, acepte únicamente el destino.
+2. **Resolución de destino**
+
+   * La llamada a `getaddrinfo()` para traducir nombre ↔ IP funciona igual.
+   * El manejo de errores con `gai_strerror()` y `strerror()` lo puedes heredar sin cambios.
+3. **Creación y checksum de paquete ICMP**
+
+   * En `packets_bonus.c` / `packets.c` tienes la lógica de rellenar la cabecera ICMP, calcular el checksum y volcar el timestamp en el payload. Eso es idéntico para traceroute.
+4. **Envío y recepción brute-force**
+
+   * La función `sendto()` y el bucle `recvfrom()` con `select()` / `gettimeofday()` para calcular RTT están ya implementados y medidos.
+5. **Impresión de resultados**
+
+   * En `prints_bonus.c` / `prints.c` tienes helpers para formatear tiempos, errores y cabeceras. Los usarás para componer cada línea de salto en traceroute.
+
+---
+
+## 2. Flujo de programa propuesto para ft\_traceroute
+
+```mermaid
+flowchart TD
+    A[Inicio: parseo de args] --> B[--help?] 
+    B -- Sí --> C[Muestra uso y sale]
+    B -- No --> D[getaddrinfo(destino)]
+    D --> E[sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)]
+    E --> F[gettimeofday(&t0_global)]
+    F --> G[for ttl = 1..MAX_HOPS]
+    G --> H[setsockopt(sock, IPPROTO_IP, IP_TTL, &ttl)]
+    H --> I[for cada intento (p.ej. 3 queries)]
+    I --> J[preparo paquete ICMP con id=getpid(), seq++]
+    J --> K[gettimeofday(&t1)]
+    K --> L[sendto(sock, paquete)]
+    L --> M[select() con timeout 3s]
+    M -- timeout --> N[imprime “*”]
+    M -- recibe --> O[recvfrom(sock, buf, &addr)]
+    O --> P[gettimeofday(&t2)]
+    P --> Q[parseo ICMP reply:
+         • tipo=11 → Time Exceeded
+         • tipo=0 y id coincide → Echo Reply]
+    Q --> R[calcula RTT = t2−t1]
+    R --> S[imprime línea: ttl  IP_origen  RTTs…]
+    S --> T[si Echo Reply rompe bucle ttl]
+    T --> U[fin for ttl]
+    U --> V[close(sock) y exit]
+```
+
+### Detalles clave a implementar
+
+* **TTL incremental**:
+  Cada iteración del bucle principal incrementa el TTL con `setsockopt(IP_TTL)`.
+* **Control de intentos**:
+  Lo habitual es enviar 3 probes por hop. Puedes parametrizarlo luego en bonus, pero empieza con 3 fijos.
+* **Timeout y asteriscos**:
+  Si `select()` expira, dibuja un `*` en lugar del tiempo.
+* **Detección de fin**:
+  Cuando recibes un **Echo Reply** proveniente de tu destino (mismo PID y tipo 0), dejas de incrementar TTL y finalizas.
+* **Impresión sin DNS inverso**:
+  El subject prohíbe hacer **reverse DNS** en cada salto. Sólo muestra la IP (**inet\_ntoa**) y, si quieres, el FQDN original en la cabecera inicial.
+* **Medición de RTT**:
+  Igual que en ft\_ping: `gettimeofday()` justo antes de `sendto()` y justo tras `recvfrom()`.
+
+---
+
+Con este esqueleto, ya tienes claro qué módulos de **ft\_ping** heredas y cómo encadenarás la lógica de traceroute: parseo → resolución → socket/raw → bucle TTL → paquete ICMP → espera/recepción → impresión → detecta destino. A partir de aquí puedes empezar a extraer funciones de tus fuentes de ft\_ping y adaptarlas para el nuevo flujo.
+
