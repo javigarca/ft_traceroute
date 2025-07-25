@@ -48,8 +48,8 @@ int main (int argc, char **argv)
     get_socket_info(socket_fd, &stats);
   
     ////impresión cabeceras
-    print_infof(opts.verbose, stderr, "ft_traceroute: sock4.fd: %d (socktype: %s), sock6.fd: -1 (socktype: 0), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
-    print_infof(opts.verbose,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", stats.socket_i.family_str, stats.target.hostname);
+    print_infof(opts.debug, stderr, "ft_traceroute: sock4.fd: %d (socktype: %s), sock6.fd: -1 (socktype: 0), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
+    print_infof(opts.debug,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", stats.socket_i.family_str, stats.target.hostname);
     print_infof(1, stdout, "traceroute %s (%s) %d(%d) bytes of data.", stats.target.hostname, stats.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
 
     int seq = 1;

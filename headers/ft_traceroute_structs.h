@@ -13,7 +13,8 @@
   * 
   */
  typedef struct s_traceroute_options {
-	int 		verbose;
+	int         debug;
+    int 		version;
 	const char	*target;
 } t_traceroute_options;
 

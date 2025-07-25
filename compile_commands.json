@@ -1,1 +1,66 @@
-[]
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers",
+      "-c",
+      "-o",
+      "obj/ft_traceroute.o",
+      "sources/ft_traceroute.c"
+    ],
+    "directory": "/home/javi/42/ft_traceroute",
+    "file": "/home/javi/42/ft_traceroute/sources/ft_traceroute.c",
+    "output": "/home/javi/42/ft_traceroute/obj/ft_traceroute.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers",
+      "-c",
+      "-o",
+      "obj/packets.o",
+      "sources/packets.c"
+    ],
+    "directory": "/home/javi/42/ft_traceroute",
+    "file": "/home/javi/42/ft_traceroute/sources/packets.c",
+    "output": "/home/javi/42/ft_traceroute/obj/packets.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers",
+      "-c",
+      "-o",
+      "obj/parse_args.o",
+      "sources/parse_args.c"
+    ],
+    "directory": "/home/javi/42/ft_traceroute",
+    "file": "/home/javi/42/ft_traceroute/sources/parse_args.c",
+    "output": "/home/javi/42/ft_traceroute/obj/parse_args.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers",
+      "-c",
+      "-o",
+      "obj/prints.o",
+      "sources/prints.c"
+    ],
+    "directory": "/home/javi/42/ft_traceroute",
+    "file": "/home/javi/42/ft_traceroute/sources/prints.c",
+    "output": "/home/javi/42/ft_traceroute/obj/prints.o"
+  }
+]

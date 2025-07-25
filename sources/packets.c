@@ -51,7 +51,7 @@ int send_packet(int sockfd, const t_traceroute_options *opts, t_stats *stats, ui
 	sent_bytes = sendto(sockfd, &packet, sizeof(packet), 0, (struct sockaddr *)&stats->target.addr, sizeof(stats->target.addr));
 
 	if (sent_bytes < 0) {
-		print_infof(opts->verbose, stderr, "sendto failed: %s", strerror(errno));
+		print_infof(opts->debug, stderr, "sendto failed: %s", strerror(errno));
 		return -1;
 	}
 
@@ -89,7 +89,7 @@ int receive_packet(int sockfd, uint16_t sent_seq, const t_traceroute_options *op
     uint16_t icmp_len = len - (ip->ihl * 4);
     uint16_t calculated_checksum = htons(calc_checksum(icmp, icmp_len));
     if (received_checksum != calculated_checksum) {
-        print_infof(opts->verbose, stderr, "Invalid ICMP checksum: expected 0x%04x, got 0x%04x\n", calculated_checksum, received_checksum);
+        print_infof(opts->debug, stderr, "Invalid ICMP checksum: expected 0x%04x, got 0x%04x\n", calculated_checksum, received_checksum);
         return (0);
     }
 

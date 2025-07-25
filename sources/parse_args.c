@@ -20,7 +20,7 @@
 void parse_args(int argc, char *argv[], t_traceroute_options *opts){
 
     if (argc < 2){
-        print_usage();
+        print_help();
         exit(EXIT_SUCCESS);
     }
 
@@ -33,20 +33,21 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
                 if (!strcmp(argv[i], "--help")){
                         print_help();
                         exit(EXIT_SUCCESS);
-                    }
-                    if (!strcmp(argv[i], "--verbose")){
-                        opts->verbose = 1;
-                    }
-                    if (!strcmp(argv[i], "--usage")){
-                        print_usage();
+                }
+                if (!strcmp(argv[i], "--version")){
+                        print_version();
                         exit(EXIT_SUCCESS);
-                    }
-                    error_exit(EXIT_FAILURE, 0, "Unknown option: %s", argv[i]);   
+                }
+                error_exit(EXIT_FAILURE, 0, "Unknown option: %s", argv[i]);   
             } else {
                 for (int j = 1; argv[i][j]; j++){
                     switch (argv[i][j]) {
-                        case 'v': 
-                            opts->verbose=1;
+                        case 'V': 
+                            opts->version=1;
+                            print_version();
+                            exit(EXIT_SUCCESS);
+                        case 'd': 
+                            opts->debug=1;
                             break;
                         case '?': 
                             print_help(); 

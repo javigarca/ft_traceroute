@@ -12,22 +12,21 @@
  * 
  */
 void    print_help(){
-    printf("\nUsage:\n  ft_traceroute [options] <destination>\n");
+    printf("\nUsage:\n  ft_traceroute [options] <host>\n");
     printf("Options:\n");
-    printf("  --usage            display usage and exit\n");
-    printf("  -v, --verbose      verbose output\n");
-    printf("  -?, --help         display this help and exit\n");
+    printf("  -V  --version               Print version info and exit\n");
+    printf("  --help                      Read this help and exit\n");
+    printf("Arguments:\n+     host          The host to traceroute to\n");
 }
 
 /**
- * @brief Función de impresión del uso del programa y consejo de help
+ * @brief Función de impresion de la verisión.
  * 
  */
-void    print_usage(void){
-    printf("\nUsage: ft_traceroute [options] host\n");
-    printf("Try 'ft_traceroute --help' or 'ft_traceroute -?' for more information.\n");
+void    print_version(){
+    printf("(42 Urduliz Project) - ft_traceroute for Linux, version 0.2.0\n");
+    printf("Copyright (c) 2025 Javier García-Arango Vázquez-Prada, License: none (All rights reserved)\n");
 }
-
  /**
  * @brief Función de impresión de error y salida del programa 
  * 
@@ -89,15 +88,15 @@ void    print_summary(t_stats *stats){
 }
 
 /**
- * @brief Función para imprimir mensajes en función de verbose
+ * @brief Función para imprimir mensajes en función de debug
  * 
- * @param verbose valor del flag  
+ * @param debug valor del flag  
  * @param fmt Cadena de formato estilo printf para el mensaje personalizado.
  * @param ... Argumentos variables usados junto con fmt para construir el mensaje.
  */
 
- void   print_infof(int verbose, FILE *stream, const char *fmt, ...){
-    if (!verbose)
+ void   print_infof(int debug, FILE *stream, const char *fmt, ...){
+    if (!debug)
         return;
     va_list args;
     va_start(args, fmt);
