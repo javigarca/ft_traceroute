@@ -43,7 +43,6 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
                 for (int j = 1; argv[i][j]; j++){
                     switch (argv[i][j]) {
                         case 'V': 
-                            opts->version=1;
                             print_version();
                             exit(EXIT_SUCCESS);
                         case 'd': 

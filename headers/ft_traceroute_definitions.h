@@ -8,12 +8,12 @@
  // ICMP Codes
  #define ICMP_CODE_DEFAULT  0 // Para echo request/reply siempre es 0
 
- // ICMP tamaños
+ // ICMP tamaños del UDP
  #define ICMP_HEADER_LEN    8
  #define IP_HEADER_LEN      20
- #define PAYLOAD_SIZE       56       
+ #define PAYLOAD_SIZE       32       
  #define ICMP_PACKET_LEN    (ICMP_HEADER_LEN + PAYLOAD_SIZE)
- #define WIRE_BYTES         (IP_HEADER_LEN + ICMP_HEADER_LEN + PAYLOAD_SIZE)  // 84
+ #define WIRE_BYTES         (IP_HEADER_LEN + ICMP_HEADER_LEN + PAYLOAD_SIZE)  // 60
 
  // TRACEROUTE configuration
  #define MAX_HOPS       30

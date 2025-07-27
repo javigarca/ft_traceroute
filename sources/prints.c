@@ -24,7 +24,7 @@ void    print_help(){
  * 
  */
 void    print_version(){
-    printf("(42 Urduliz Project) - ft_traceroute for Linux, version 0.2.0\n");
+    printf("(42 Urduliz Project) - ft_traceroute for Linux, version 0.2.2\n");
     printf("Copyright (c) 2025 Javier García-Arango Vázquez-Prada, License: none (All rights reserved)\n");
 }
  /**
@@ -62,6 +62,7 @@ void    error_exit(int status, int errnum, const char *fmt, ...){
  * 
  * @param stats estructura de las esteadisticas 
  */
+ /*
 void    print_summary(t_stats *stats){
 	double loss = 0.0;
     struct timeval end_traceroute;
@@ -86,7 +87,7 @@ void    print_summary(t_stats *stats){
 			stats->rtt_min, avg, stats->rtt_max, mdev);
 	}
 }
-
+*/
 /**
  * @brief Función para imprimir mensajes en función de debug
  * 

@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <time.h>
 #include "ft_traceroute.h"
 #include "ft_traceroute_definitions.h"
 #include "ft_traceroute_structs.h"
@@ -22,41 +23,56 @@
  * @return int 
  */
 
-static t_stats *g_stats_ref = NULL;
+
+volatile sig_atomic_t g_interrupted;
 
 int main (int argc, char **argv)
 {
     t_traceroute_options opts = {0};
-    t_stats stats = {0};
-    g_stats_ref = &stats;
+    struct sigaction sa = {0};
+    int socket_send, socket_recv;
+
+    sa.sa_handler = sigint_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if (sigaction(SIGINT, &sa, NULL)) {
+        error_exit(EXIT_FAILURE, errno, "sigaction error.");
+    }
 
     parse_args(argc, argv, &opts);   
-    signal(SIGINT, handle_sigint);
-
-    int socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-    if (socket_fd < 0){
-        if (errno == EPERM || errno == EACCES || errno == EPROTONOSUPPORT)
-		    error_exit(EXIT_FAILURE, 0, "ft_traceroute: Lacking privilege for icmp socket.\n");
-        error_exit(EXIT_FAILURE, errno, "socket" );
+    socket_send = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (socket_send < 0){
+        error_exit(EXIT_FAILURE, errno, "socket UDP" );
     }
+    socket_recv = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    if (socket_recv < 0){
+        if (errno == EPERM || errno == EACCES || errno == EPROTONOSUPPORT)
+		    error_exit(EXIT_FAILURE, 0, "ft_traceroute: Lacking privilege for ICMP socket.\n");
+        error_exit(EXIT_FAILURE, errno, "socket ICMP" );
+    }
+
+
+
+
+
+    ////******////*/*/*/*/*/*//***/**/*/*/*/*/*/*/*/* */ */ */
+    /*/
     //Activar IP_RECVTTL en el socket:
     int opt = 1;
     setsockopt(socket_fd, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
     
-    if (resolve_target(&opts, &stats.target))
+    if (resolve_target(&opts, &opts.target))
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
-    get_socket_info(socket_fd, &stats);
+    
   
-    ////impresión cabeceras
-    print_infof(opts.debug, stderr, "ft_traceroute: sock4.fd: %d (socktype: %s), sock6.fd: -1 (socktype: 0), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
-    print_infof(opts.debug,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", stats.socket_i.family_str, stats.target.hostname);
-    print_infof(1, stdout, "traceroute %s (%s) %d(%d) bytes of data.", stats.target.hostname, stats.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
+    ////impresión cabecera
+    print_infof(1, stdout, "traceroute to %s (%s) %d(%d) bytes of data.", opts.target.hostname, opts.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
 
     int seq = 1;
-    gettimeofday(&stats.start_traceroute, NULL);
+    gettimeofday(&opts.start_traceroute, NULL);
    
     while(1){
-        send_packet(socket_fd, &opts, &stats, seq);
+        send_packet(socket_fd, &opts, seq);
         //timestamp de comienzo de bucle
         struct timeval start, now;
         gettimeofday(&start, NULL);
@@ -86,14 +102,15 @@ int main (int argc, char **argv)
                 break;    // timeout
 
             //analisis de packete
-            if (receive_packet(socket_fd, seq, &opts, &stats)) {
+            if (receive_packet(socket_fd, seq, &opts)) {
                 break;
             }
-            /*si no es correcto el paquete o no encontramos nada, empezamos bucle otra vez */
+            //si no es correcto el paquete o no encontramos nada, empezamos bucle otra vez 
         }
         seq++;
         sleep(1);
     }
+    */
     return (EXIT_SUCCESS);
 }
 
@@ -102,9 +119,7 @@ int main (int argc, char **argv)
  * 
  * @param signum el valor de la señal
  */
-void    handle_sigint(int signum){
+void    sigint_handler(int signum){
     (void)signum;
-    if (g_stats_ref)
-		print_summary(g_stats_ref);
-    exit(EXIT_SUCCESS);
+    g_interrupted = 1;
 }

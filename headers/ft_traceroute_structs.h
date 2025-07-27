@@ -8,16 +8,6 @@
 # include <sys/time.h>
 # include "ft_traceroute_definitions.h"
 
- /**
-  * @brief estructura para las flags. autoexplicativas
-  * 
-  */
- typedef struct s_traceroute_options {
-	int         debug;
-    int 		version;
-	const char	*target;
-} t_traceroute_options;
-
 /**
  * @brief Información del host de destino resuelta desde el nombre o IP.
  * Contiene:
@@ -32,37 +22,15 @@ typedef struct s_target {
 } t_target;
 
 /**
- * @brief Estructura con la info del socket para impresiones
- * 
- */
-typedef struct s_socket_info {
-	int fd;
-	int socktype;         // SOCK_RAW, SOCK_DGRAM, etc.
-	int family;           // AF_INET, AF_INET6...
-	char *family_str;     // "AF_INET" (dinámico o literal)
-	char *socktype_str;   // "SOCK_RAW", etc.
-} t_socket_info;
-
-/**
- * @brief Estructura para las estadísticas.
- * 
- * RTT significa Round-Trip Time: el tiempo que tarda un paquete en ir desde tu máquina al host remoto y volver con la respuesta.
- * Este valor se mide en milisegundos (ms).
- * 
- * rtt min/avg/max/mdev
- * mdev, desviación de latencia, cuanto menor más estable es la conexión
- */
-typedef struct s_stats {
-	int 			transmitted;         	// Nº total de paquetes enviados
-	int 			received;            	// Nº total de paquetes recibidos correctamente
-	double 			rtt_min;          	// Menor RTT observado (latencia más baja)
-	double 			rtt_max;          	// Mayor RTT observado (latencia más alta)
-	double 			rtt_total;        	// Suma acumulada de todos los RTT (para calcular la media)
-	double 			rtt_squared_total;	// Suma de los RTT^2 (para calcular la desviación estándar)
-	t_target		target;
-	t_socket_info	socket_i;
+  * @brief estructura para las flags, información del socket y del host, tiempos
+  * 
+  */
+ typedef struct s_traceroute_options {
+	int             debug;
+	const char      *host;
+    t_target		target;
 	struct timeval	start_traceroute; 
-} t_stats;
+} t_traceroute_options;
 
 /**
  * @brief Cabecera ICMP tal y como debe enviarse en un paquete ICMP Echo.
@@ -86,8 +54,8 @@ typedef struct s_icmphdr {
  * Este buffer es el que se enviará y recibirá con sendto()/recvfrom().
  */
 typedef struct s_packet {
-	t_icmphdr	header;              // Cabecera ICMP
-	uint8_t 		payload[PAYLOAD_SIZE];   // Payload arbitrario (p.ej., timestamp o relleno)
+	t_icmphdr   header;              // Cabecera ICMP
+	uint8_t 	payload[PAYLOAD_SIZE];   // Payload arbitrario (p.ej., timestamp o relleno)
 } t_packet;
 
 #endif
