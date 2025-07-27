@@ -15,4 +15,8 @@
  #define ICMP_PACKET_LEN    (ICMP_HEADER_LEN + PAYLOAD_SIZE)
  #define WIRE_BYTES         (IP_HEADER_LEN + ICMP_HEADER_LEN + PAYLOAD_SIZE)  // 84
 
+ // TRACEROUTE configuration
+ #define MAX_HOPS       30
+ #define NUM_PROBES     3
+
 #endif

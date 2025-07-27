@@ -67,7 +67,7 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
     }
 
     if (hostcont == 0) {
-        error_exit(EXIT_FAILURE, 0, "Missing host operand");
+        error_exit(EXIT_FAILURE, 0, "Specify <host> missing argument");
     }
     if (hostcont != 1) {
         error_exit(EXIT_FAILURE, 0,"only one destination allowed");
@@ -82,12 +82,7 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
  * @return int 
  */
 int resolve_target(t_traceroute_options *opts, t_target *t_out){
-    if (!opts->target || strlen(opts->target) == 0)
-	    error_exit(EXIT_FAILURE, 0, "Empty host name");
-
-    if (strlen(opts->target) > 255)
-	    error_exit(EXIT_FAILURE, 0, "Host name too long");
-    
+        
     struct addrinfo hints;
 	struct addrinfo *result;
 	int ret;
@@ -95,7 +90,7 @@ int resolve_target(t_traceroute_options *opts, t_target *t_out){
 	// Preparar estructura de filtro
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;       // Solo IPv4
-	hints.ai_socktype = SOCK_RAW;    // Tipo de socket (aunque no importa mucho aquí)
+	hints.ai_socktype = SOCK_RAW;    // 
 	hints.ai_protocol = IPPROTO_ICMP;
 
 	// Resolver
