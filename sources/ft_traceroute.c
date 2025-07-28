@@ -1,3 +1,4 @@
+#include <bits/types/struct_timeval.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -72,8 +73,17 @@ int main (int argc, char **argv)
             error_exit(EXIT_FAILURE, 0, "Error setting TTL: %u", ttl);
         print_infof(1, stdout, "%u ", ttl);
         for (size_t probe = 0; probe < NUM_PROBES; probe++) {
+            struct timeval t_send, t_recv;
+            long t_rtt_ms;
+
+            gettimeofday(&t_send, NULL);
             //envío de probe
             //recepcion de probe e impresión de su tiempo
+            gettimeofday(&t_recv, NULL);
+            t_rtt_ms = (t_recv.tv_sec  - t_send.tv_sec) * 1000 + (t_recv.tv_usec - t_send.tv_usec) / 1000;
+            // si timeout, imprimir '*'
+            print_infof(1, stdout,"%l ", t_rtt_ms);
+            
         }
     }
 
@@ -93,7 +103,7 @@ int main (int argc, char **argv)
   
 
     int seq = 1;
-    gettimeofday(&opts.start_traceroute, NULL);
+    
    
     while(1){
         send_packet(socket_fd, &opts, seq);
