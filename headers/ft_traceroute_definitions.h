@@ -16,7 +16,7 @@
  #define WIRE_BYTES         (IP_HEADER_LEN + ICMP_HEADER_LEN + PAYLOAD_SIZE)  // 60
 
  // TRACEROUTE configuration
- #define MAX_HOPS       30
+ #define NUM_TTL       30
  #define NUM_PROBES     3
 
 #endif

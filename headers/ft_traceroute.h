@@ -15,8 +15,7 @@
 
  //**** parse_args.c ****//
  void       parse_args(int argc, char *argv[], t_traceroute_options *opts);
-//int        resolve_target(t_traceroute_options *opts, t_target *t_out);
-// int        get_socket_info(int sockfd, t_traceroute_options *opts);
+ int        resolve_target(t_traceroute_options *opts);
 
  //**** main.c ****//
  void       sigint_handler(int signum);

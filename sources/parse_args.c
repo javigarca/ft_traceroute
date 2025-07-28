@@ -60,13 +60,13 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
         }
         else {
             hostcont++;
-            opts->target = argv[i]; 
+            opts->target.hostname = argv[i]; 
         }
         i++;
     }
 
     if (hostcont == 0) {
-        error_exit(EXIT_FAILURE, 0, "Specify <host> missing argument");
+        error_exit(EXIT_FAILURE, 0, "Specify \"host\" missing argument");
     }
     if (hostcont != 1) {
         error_exit(EXIT_FAILURE, 0,"only one destination allowed");
@@ -80,7 +80,7 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
  * @param t_out 
  * @return int 
  */
-int resolve_target(t_traceroute_options *opts, t_target *t_out){
+int resolve_target(t_traceroute_options *opts){
         
     struct addrinfo hints;
 	struct addrinfo *result;
@@ -93,50 +93,21 @@ int resolve_target(t_traceroute_options *opts, t_target *t_out){
 	hints.ai_protocol = IPPROTO_ICMP;
 
 	// Resolver
-	ret = getaddrinfo(opts->target, NULL, &hints, &result);
+	ret = getaddrinfo(opts->target.hostname, NULL, &hints, &result);
 	if (ret != 0) {
 		error_exit(EXIT_FAILURE, 0, "%s: %s", opts->target, gai_strerror(ret));
 	}
 
 	// Extraer sockaddr_in
 	struct sockaddr_in *addr = (struct sockaddr_in *)result->ai_addr;
-	t_out->addr = *addr;
+	opts->target.addr = *addr;
 
 	// Convertir IP a string
-	if (!inet_ntop(AF_INET, &addr->sin_addr, t_out->ip_str, INET_ADDRSTRLEN)) {
+	if (!inet_ntop(AF_INET, &addr->sin_addr, opts->target.ip_str, INET_ADDRSTRLEN)) {
 		freeaddrinfo(result);
 		error_exit(EXIT_FAILURE, errno, "inet_ntop");
 	}
 
-	t_out->hostname = opts->target; 
-
 	freeaddrinfo(result);
 	return (0);
-}
-
-/**
- * @brief Devuelve la información de tipo de socket y familia. devulve 0 si todo bien
- * 
- * @param sockfd 
- * @param stats 
- * @return int 
- */
-int get_socket_info(int sockfd, t_stats *stats) {
-    socklen_t optlen = sizeof(int);
-
-    // Obtener tipo real del socket
-    if (getsockopt(sockfd, SOL_SOCKET, SO_TYPE, &stats->socket_i.socktype, &optlen) < 0)
-        error_exit(EXIT_FAILURE, errno, "getsockopt SO_TYPE failed");
-
-    // Traducir tipo a string
-    stats->socket_i.socktype_str = (stats->socket_i.socktype == SOCK_RAW) ? "SOCK_RAW" :
-                        (stats->socket_i.socktype == SOCK_DGRAM) ? "SOCK_DGRAM" :
-                        (stats->socket_i.socktype == SOCK_STREAM) ? "SOCK_STREAM" : "UNKNOWN";
-
-    // Guardar familia (usada en hints o result) // de momento en mandatory con ip4 nos vale así
-    stats->socket_i.family = AF_INET;
-    stats->socket_i.family_str = (stats->socket_i.family == AF_INET) ? "AF_INET" :
-                    (stats->socket_i.family == AF_INET6) ? "AF_INET6" : "UNSPEC";
-    
-    return(0);
 }

@@ -3,12 +3,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <time.h>
 #include "ft_traceroute.h"
 #include "ft_traceroute_definitions.h"
 #include "ft_traceroute_structs.h"
+
+volatile sig_atomic_t g_interrupted;
+
+/**
+ * @brief Función para controlar la señal SIGINT
+ * 
+ * @param signum el valor de la señal
+ */
+void    sigint_handler(int signum){
+    (void)signum;
+    g_interrupted = 1;
+}
 
 /**
  * @brief Flujo principal del programa
@@ -22,9 +35,6 @@
  * @param argv 
  * @return int 
  */
-
-
-volatile sig_atomic_t g_interrupted;
 
 int main (int argc, char **argv)
 {
@@ -50,23 +60,37 @@ int main (int argc, char **argv)
 		    error_exit(EXIT_FAILURE, 0, "ft_traceroute: Lacking privilege for ICMP socket.\n");
         error_exit(EXIT_FAILURE, errno, "socket ICMP" );
     }
-
-
-
-
-
-    ////******////*/*/*/*/*/*//***/**/*/*/*/*/*/*/*/* */ */ */
-    /*/
-    //Activar IP_RECVTTL en el socket:
-    int opt = 1;
-    setsockopt(socket_fd, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
     
-    if (resolve_target(&opts, &opts.target))
+    if (resolve_target(&opts))
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
-    
-  
+
     ////impresión cabecera
     print_infof(1, stdout, "traceroute to %s (%s) %d(%d) bytes of data.", opts.target.hostname, opts.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
+
+    for (size_t ttl = 1; ttl <= NUM_TTL && g_interrupted == 0; ttl++){
+         if (setsockopt(socket_send, IPPROTO_UDP, IP_RECVTTL, &ttl, sizeof(ttl)) < 0)
+            error_exit(EXIT_FAILURE, 0, "Error setting TTL: %u", ttl);
+        print_infof(1, stdout, "%u ", ttl);
+        for (size_t probe = 0; probe < NUM_PROBES; probe++) {
+            //envío de probe
+            //recepcion de probe e impresión de su tiempo
+        }
+    }
+
+    ////******////*/*/*/*/*/*//***/**/*/*/*/*/*/*/*/* */ */ */
+    
+    /*/
+    Generar el bucle aumentando el ttl hasta lo definido.
+        antes sleccionar el ttl correcto para ese intento
+        envio de probes hasta el númeor definido
+            recibir por cada probe e imprimir la info.
+    si se rompre por señal, cerra sockets y pista
+    salir
+
+    //Activar IP_RECVTTL en el socket:
+    int opt = 1;
+    setsockopt(socket_send, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
+  
 
     int seq = 1;
     gettimeofday(&opts.start_traceroute, NULL);
@@ -111,15 +135,8 @@ int main (int argc, char **argv)
         sleep(1);
     }
     */
+    close(socket_recv);
+    close(socket_send);
+    
     return (EXIT_SUCCESS);
-}
-
-/**
- * @brief Función para controlar la señal SIGINT
- * 
- * @param signum el valor de la señal
- */
-void    sigint_handler(int signum){
-    (void)signum;
-    g_interrupted = 1;
 }
