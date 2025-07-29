@@ -27,11 +27,8 @@ void    sigint_handler(int signum){
 /**
  * @brief Flujo principal del programa
  * 
- * recibe los argumentos, inicializa estructuras, parseo de argumentos, creación de socket, envío de socket y respuesta. Tratamiento de señales, crtl+C. 
+ * recibe los argumentos, inicializa estructuras, parseo de argumentos, creación de sockets, envío de socket y recepción de respuestas. Tratamiento de señales, crtl+C. 
  *
- * varible global de puntero controlado a la dirección de la estructura de la estadística para solo usarla en el caso de imprimir el resumen de las estadísticas, 
- * y no andar cambiando glabales todo el tiempo.
-
  * @param argc 
  * @param argv 
  * @return int 
@@ -39,10 +36,11 @@ void    sigint_handler(int signum){
 
 int main (int argc, char **argv)
 {
-    t_traceroute_options opts = {0};
-    struct sigaction sa = {0};
-    int socket_send, socket_recv;
-
+    t_traceroute_options    opts = {0};
+    struct sigaction        sa = {0};
+    int                     socket_send, socket_recv;
+    int                     seq = 0;
+    
     sa.sa_handler = sigint_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
@@ -66,85 +64,58 @@ int main (int argc, char **argv)
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
 
     ////impresión cabecera
-    print_infof(1, stdout, "traceroute to %s (%s) %d(%d) bytes of data.", opts.target.hostname, opts.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
+    print_infofn(1, stdout, "ft_traceroute to %s (%s) %d hops max %d bytes packets", opts.target.hostname, opts.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
 
     for (size_t ttl = 1; ttl <= NUM_TTL && g_interrupted == 0; ttl++){
-         if (setsockopt(socket_send, IPPROTO_UDP, IP_RECVTTL, &ttl, sizeof(ttl)) < 0)
+         if (setsockopt(socket_send, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
             error_exit(EXIT_FAILURE, 0, "Error setting TTL: %u", ttl);
         print_infof(1, stdout, "%u ", ttl);
+    
         for (size_t probe = 0; probe < NUM_PROBES; probe++) {
-            struct timeval t_send, t_recv;
-            long t_rtt_ms;
+            struct  timeval t_send, t_recv, time_out;
+            double    t_rtt_ms;
+            int     response = 0;
+            fd_set  rfds;
 
-            gettimeofday(&t_send, NULL);
-            //envío de probe
-            //recepcion de probe e impresión de su tiempo
-            gettimeofday(&t_recv, NULL);
-            t_rtt_ms = (t_recv.tv_sec  - t_send.tv_sec) * 1000 + (t_recv.tv_usec - t_send.tv_usec) / 1000;
-            // si timeout, imprimir '*'
-            print_infof(1, stdout,"%l ", t_rtt_ms);
+            if (!send_packet(socket_send, &opts, seq)) {
+                gettimeofday(&t_send, NULL);     
+
+                FD_ZERO(&rfds);
+                FD_SET(socket_recv, &rfds);
+                time_out.tv_sec  = DEF_TIME_OUT_S;
+                time_out.tv_usec = DEF_TIME_OUT_U;
+                
+                // imprimir el nombre de 1  _gateway (192.168.1.1)  1.649 ms  4.064 ms  4.113 ms
+                // 2  10.0.29.139 (10.0.29.139)  4.735 ms  4.647 ms  4.869 ms
+                if (probe == 0){
+                    print_infof(1, stdout," %s (%s) ", opts.hop.ip_str, opts.hop.ip_str);
+                }
+                int reply = select(socket_recv + 1, &rfds, NULL, NULL, &time_out);
+     
+                if (reply < 0)
+                    error_exit(EXIT_FAILURE, errno, "select");
+                if (reply == 0) {
+                    print_infof(1, stdout," * ");    
+                    break;
+                }
+                //analisis de paquete
+                response = receive_packet(socket_recv, seq, &opts); 
+                print_infofn(opts.debug, stderr, "RESPONSE: %d", response);
+                if (response > 0) {
+                    gettimeofday(&t_recv, NULL);
+                    t_rtt_ms = (t_recv.tv_sec  - t_send.tv_sec) * 1000.0 + (t_recv.tv_usec - t_send.tv_usec) / 1000.0;
+                    print_infof(1, stdout,"%.3f ms ", t_rtt_ms);
+                    if (response == 2 ){
+                        g_interrupted = 1;
+                    }
+                }
+            }
+            seq++;
             
         }
+        print_infof(1, stdout,"\n");
     }
-
-    ////******////*/*/*/*/*/*//***/**/*/*/*/*/*/*/*/* */ */ */
     
-    /*/
-    Generar el bucle aumentando el ttl hasta lo definido.
-        antes sleccionar el ttl correcto para ese intento
-        envio de probes hasta el númeor definido
-            recibir por cada probe e imprimir la info.
-    si se rompre por señal, cerra sockets y pista
-    salir
-
-    //Activar IP_RECVTTL en el socket:
-    int opt = 1;
-    setsockopt(socket_send, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
-  
-
-    int seq = 1;
-    
-   
-    while(1){
-        send_packet(socket_fd, &opts, seq);
-        //timestamp de comienzo de bucle
-        struct timeval start, now;
-        gettimeofday(&start, NULL);
-
-        while (1) {
-            // cálculo tiempo restante 
-            gettimeofday(&now, NULL);
-            double elapsed = (now.tv_sec - start.tv_sec)
-                        + (now.tv_usec - start.tv_usec)/1e6;
-            double left = 1.0 - elapsed;
-            if (left <= 0.0)
-                break;
-
-            fd_set rfds;
-            FD_ZERO(&rfds);
-            FD_SET(socket_fd, &rfds);
-            // un select con el tiempo restante    
-            struct timeval tv = {
-                .tv_sec  = (int)left,
-                .tv_usec = (int)((left - (int)left)*1e6)
-            };
-
-            int reply = select(socket_fd+1, &rfds, NULL, NULL, &tv);
-            if (reply < 0)
-                error_exit(EXIT_FAILURE, errno, "select");
-            if (reply == 0)
-                break;    // timeout
-
-            //analisis de packete
-            if (receive_packet(socket_fd, seq, &opts)) {
-                break;
-            }
-            //si no es correcto el paquete o no encontramos nada, empezamos bucle otra vez 
-        }
-        seq++;
-        sleep(1);
-    }
-    */
     close(socket_recv);
     close(socket_send);
     

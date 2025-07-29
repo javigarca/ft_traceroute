@@ -29,6 +29,7 @@ typedef struct s_target {
 	int             debug;
 	const char      *host;
     t_target		target;
+    t_target        hop;
 	struct timeval	start_traceroute; 
 } t_traceroute_options;
 
@@ -123,5 +124,25 @@ code	uint8_t	Código específico del tipo (más detalle).
 checksum	uint16_t	Checksum para verificar integridad.
 un.echo.id	uint16_t	Identificador para solicitudes traceroute.
 un.echo.sequence	uint16_t	Número de secuencia, incrementa por traceroute.
+
+*/
+/*
+#include <netinet/udp.h>
+
+struct udphdr {
+    uint16_t uh_sport;  // puerto origen      
+    uint16_t uh_dport;  // puerto destino     
+    uint16_t uh_ulen;   // longitud UDP       
+    uint16_t uh_sum;    // checksum UDP       
+};
+
+en Linux o en la misma libreria como union, tambíne valen estos nombres
+
+struct udphdr {
+    __be16 source;   // puerto origen 
+    __be16 dest;     // puerto destino
+    __be16 len;      // longitud UDP   
+    __sum16 check;   // checksum UDP   
+};
 
 */

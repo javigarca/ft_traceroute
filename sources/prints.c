@@ -89,7 +89,7 @@ void    print_summary(t_stats *stats){
 }
 */
 /**
- * @brief Función para imprimir mensajes en función de debug
+ * @brief Función para imprimir mensajes sin línea nueva.
  * 
  * @param debug valor del flag  
  * @param fmt Cadena de formato estilo printf para el mensaje personalizado.
@@ -97,6 +97,23 @@ void    print_summary(t_stats *stats){
  */
 
  void   print_infof(int debug, FILE *stream, const char *fmt, ...){
+    if (!debug)
+        return;
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(stream, fmt,args);
+	va_end(args);
+ }
+
+ /**
+ * @brief Función para imprimir mensajes en función de debug, línea nueva al final.
+ * 
+ * @param debug valor del flag  
+ * @param fmt Cadena de formato estilo printf para el mensaje personalizado.
+ * @param ... Argumentos variables usados junto con fmt para construir el mensaje.
+ */
+
+ void   print_infofn(int debug, FILE *stream, const char *fmt, ...){
     if (!debug)
         return;
     va_list args;
