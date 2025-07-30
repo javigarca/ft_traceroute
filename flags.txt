@@ -1,0 +1,65 @@
+Aquí tienes una descripción en español de las principales opciones que puedes añadir a tu `ft_traceroute` como bonus:
+
+* `-i <interfaz>`
+  Especifica la interfaz de red local por la que enviar los paquetes de sondeo (por ejemplo `eth0`). Esta opción está disponible en la implementación de Linux (`iputils-traceroute`).
+
+* `-m <max_hops>`
+  Define el TTL máximo (número de saltos) que traceroute intentará antes de abortar. Por defecto es 30. ([IBM][1])
+
+* `-p <puerto>`
+  Fija el puerto UDP de destino inicial para las sondas. El valor por defecto es 33434 (y luego se va incrementando). ([IBM][1])
+
+* `-s <dirección_origen>`
+  Fuerza la dirección IP de origen que usarán los paquetes de sondeo (útil en máquinas con varias IPs). ([IBM][1])
+
+* `-q <nqueries>`
+  Establece cuántos probes (sondas) enviar por cada salto. El valor por defecto es 3. ([sites.ualberta.ca][2])
+
+* `-N` (o en Linux `-n`)
+  Desactiva la resolución inversa de nombres DNS y muestra sólo las direcciones IP numéricas. ([IBM][1])
+
+* `-t <TOS>`
+  Ajusta el campo Type-Of-Service (TOS) de la cabecera IP a un valor de 0–255, para probar rutas preferentes por TOS. ([sites.ualberta.ca][2])
+
+* `-l <longitud>`
+  Especifica el tamaño (en bytes) del payload de los paquetes de sondeo. Por defecto suele ser 32–38 bytes; con `-l` puedes aumentarlo. ([sites.ualberta.ca][2])
+
+[1]: https://www.ibm.com/docs/9009-42A/p9hcg/p9hcg_traceroute.htm?utm_source
+[2]: https://sites.ualberta.ca/dept/chemeng/AIX-43/share/man/info/C/a_doc_lib/cmds/aixcmds5/traceroute.htm
+************************************************************************************************
+
+
+
+1. **Reverse DNS por hop**
+
+   * Añadir una opción `-n` / `--resolve` para hacer `getnameinfo()` y mostrar nombre ↔ IP (igual que el traceroute original).
+2. **Control de probes y timeout**
+
+   * Flags `-q <n>` para cambiar el número de probes por salto.
+   * Flag `-w <seg>` para ajustar el timeout de espera por probe.
+3. **Puerto base configurable**
+
+   * Opción `-p <puerto>` para elegir otro puerto inicial en lugar de 33434.
+4. **Estadísticas finales**
+
+   * Al terminar, imprimir un pequeño resumen: media/mín/max de RTTs global y por salto.
+5. **Soporte IPv6**
+
+   * Detectar IPv6 y usar `ICMPv6` + `IPV6_UNICAST_HOPS` + `sockaddr_in6`.
+6. **Visualización avanzada**
+
+   * Un histograma ASCII de RTTs por salto, o un diagrama de latencias.
+7. **Traceroute TCP**
+
+   * Variante que envíe `TCP SYN` a un puerto (80/443) para sortear firewalls que bloquean UDP/ICMP.
+8. **Salida JSON**
+
+   * Opción `-j` para devolver los resultados en JSON, fácil de procesar por scripts.
+9. **Parallel traceroute**
+
+   * Rastrear varios destinos simultáneamente en hilos o procesos, con columna por destino.
+10. **Geolocalización**
+
+    * Mapear cada IP a su país/ciudad y mostrarlo en la salida (usando una base de datos local).
+
+

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "ft_traceroute.h"
+#include "ft_traceroute_bonus.h"
 
 /**
  * @brief Función de impresion de ayuda copleta del programa
@@ -55,6 +55,37 @@ void    error_exit(int status, int errnum, const char *fmt, ...){
     exit(status);
 }
 
+/**
+ * @brief Función para imprimir el resumen de las estadísticas que recibe como parámetro
+ * 
+ * @param stats estructura de las esteadisticas 
+ */
+ /*
+void    print_summary(t_stats *stats){
+	double loss = 0.0;
+    struct timeval end_traceroute;
+    gettimeofday(&end_traceroute, NULL);
+    long elapsed_time = (end_traceroute.tv_sec - stats->start_traceroute.tv_sec) * 1000 + (end_traceroute.tv_usec - stats->start_traceroute.tv_usec) / 1000;
+
+	if (stats->transmitted > 0)
+		loss = 100.0 * (stats->transmitted - stats->received) / stats->transmitted;
+
+	printf("\n--- %s traceroute statistics ---\n", stats->target.hostname);
+	printf("%d packets transmitted, %d received, %.0f%% packet loss, time %ldms\n",
+		stats->transmitted, stats->received, loss, elapsed_time);
+
+	if (stats->received > 0) {
+		double avg = stats->rtt_total / stats->received;
+		double mdev = 0;
+		if (stats->received > 1) {
+			double mean_sq = stats->rtt_squared_total / stats->received;
+			mdev = sqrt(mean_sq - avg * avg);
+		}
+		printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n",
+			stats->rtt_min, avg, stats->rtt_max, mdev);
+	}
+}
+*/
 /**
  * @brief Función para imprimir mensajes sin línea nueva.
  * 

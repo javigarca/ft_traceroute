@@ -8,9 +8,9 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <time.h>
-#include "ft_traceroute.h"
-#include "ft_traceroute_definitions.h"
-#include "ft_traceroute_structs.h"
+#include "ft_traceroute_bonus.h"
+#include "ft_traceroute_definitions_bonus.h"
+#include "ft_traceroute_structs_bonus.h"
 
 volatile sig_atomic_t g_interrupted;
 
@@ -98,7 +98,7 @@ int main (int argc, char **argv)
                     }
                 }
                 if (reply == 0) {
-                    print_infof(1, stdout," * ");    
+                    print_infof(1, stdout," *");    
                     continue;
                 }
                 //analisis de paquete

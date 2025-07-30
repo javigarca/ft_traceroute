@@ -5,6 +5,70 @@
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-I./headers/bonus",
+      "-c",
+      "-o",
+      "obj/packets_bonus.o",
+      "sources/bonus/packets_bonus.c"
+    ],
+    "directory": "/home/javi/42/ft_traceroute",
+    "file": "/home/javi/42/ft_traceroute/sources/bonus/packets_bonus.c",
+    "output": "/home/javi/42/ft_traceroute/obj/packets_bonus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers/bonus",
+      "-c",
+      "-o",
+      "obj/parse_args_bonus.o",
+      "sources/bonus/parse_args_bonus.c"
+    ],
+    "directory": "/home/javi/42/ft_traceroute",
+    "file": "/home/javi/42/ft_traceroute/sources/bonus/parse_args_bonus.c",
+    "output": "/home/javi/42/ft_traceroute/obj/parse_args_bonus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers/bonus",
+      "-c",
+      "-o",
+      "obj/prints_bonus.o",
+      "sources/bonus/prints_bonus.c"
+    ],
+    "directory": "/home/javi/42/ft_traceroute",
+    "file": "/home/javi/42/ft_traceroute/sources/bonus/prints_bonus.c",
+    "output": "/home/javi/42/ft_traceroute/obj/prints_bonus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers/bonus",
+      "-c",
+      "-o",
+      "obj/ft_traceroute_bonus.o",
+      "sources/bonus/ft_traceroute_bonus.c"
+    ],
+    "directory": "/home/javi/42/ft_traceroute",
+    "file": "/home/javi/42/ft_traceroute/sources/bonus/ft_traceroute_bonus.c",
+    "output": "/home/javi/42/ft_traceroute/obj/ft_traceroute_bonus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
       "-I./headers",
       "-c",
       "-o",
