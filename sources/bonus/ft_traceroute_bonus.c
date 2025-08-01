@@ -39,7 +39,7 @@ int main (int argc, char **argv)
     t_traceroute_options    opts = {0};
     struct sigaction        sa = {0};
     int                     socket_send, socket_recv;
-    int                     seq = 0;
+    int                     seq = -1;
     
     sa.sa_handler = sigint_handler;
     sigemptyset(&sa.sa_mask);
@@ -49,10 +49,16 @@ int main (int argc, char **argv)
     }
 
     parse_args(argc, argv, &opts);   
+    
     socket_send = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (socket_send < 0){
         error_exit(EXIT_FAILURE, errno, "socket UDP" );
     }
+    //incluir cabecera IP desde el kernel
+   // int ip = 1;
+    //if (setsockopt(socket_send, IPPROTO_IP, IP_HDRINCL, &ip, sizeof(ip)) < 0)
+    //        error_exit(EXIT_FAILURE, 0, "Error setting IP header: %u", ip);
+
     socket_recv = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     if (socket_recv < 0){
         if (errno == EPERM || errno == EACCES || errno == EPROTONOSUPPORT)
@@ -78,7 +84,7 @@ int main (int argc, char **argv)
             double  t_rtt_ms;
             int     response = 0;
             fd_set  rfds;
-
+            seq++;
             if (!send_packet(socket_send, &opts, seq)) {
                 gettimeofday(&t_send, NULL);     
 
@@ -98,12 +104,12 @@ int main (int argc, char **argv)
                     }
                 }
                 if (reply == 0) {
-                    print_infof(1, stdout," *");    
+                    print_infof(1, stdout," *");
+                    fflush(stdout);    
                     continue;
                 }
                 //analisis de paquete
                 response = receive_packet(socket_recv, seq, &opts); 
-                print_infofn(opts.debug, stderr, "RESPONSE: %d", response);
                     if (response > 0) {
                         if (strcmp(opts.hop.ip_str,last_ip) != 0){
                             strcpy(last_ip, opts.hop.ip_str);
@@ -116,13 +122,13 @@ int main (int argc, char **argv)
                             g_interrupted = 1;
                         }
                 }
-            }
-            seq++;
-            
+            }            
         }
         print_infof(1, stdout,"\n");
     }
-    
+
+    if (opts.debug)
+        print_opts(&opts);
     close(socket_recv);
     close(socket_send);
     

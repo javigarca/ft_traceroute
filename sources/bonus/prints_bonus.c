@@ -12,9 +12,14 @@
 void    print_help(){
     printf("\nUsage:\n  ft_traceroute [options] <host>\n");
     printf("Options:\n");
+    printf("  -p port                     Set the destination port to use as initial udp port value for \"default\" method\n");
+    printf("                              (incremented by each probe, default is 33434)\n");
     printf("  -V  --version               Print version info and exit\n");
     printf("  --help                      Read this help and exit\n");
-    printf("Arguments:\n+     host          The host to traceroute to\n");
+    printf("Arguments:\n");
+    printf("+     host          The host to traceroute to\n");
+    printf("      packetlen     The full packet length (default is the length of an IP header plus 40).\n");
+    printf("                    Can be ignored or increased to a minimal allowed value");
 }
 
 /**
@@ -120,3 +125,35 @@ void    print_summary(t_stats *stats){
 	va_end(args);
 	fprintf(stream, "\n");
  }
+
+ /**
+ * @brief Función debug para imprimir las ping options
+ * 
+ * @param opts estructura de ping options
+ */
+void    print_opts(const t_traceroute_options *opts) {
+    printf("=== Parsed options ===\n");
+    printf("  port          = %d\n", opts->port);
+    //printf("  count         = %d\n", opts->count);
+    //printf("  interval      = %.6f\n", opts->interval);
+    printf("  target host   = %s\n", opts->host ? opts->host : "(null)");
+    //printf("  route         = %d\n", opts->route);
+    //printf("  use_pattern   = %d\n", opts->pattern_use);
+    //printf("  ttl           = %d\n", opts->ttl_use);
+    //if (opts->ttl_use)
+    //    printf("  ttl value     = %d\n", opts->ttl);
+    //if (opts->pattern_use) {
+    //    printf("  pattern_len   = %zu\n", opts->pattern_len);
+    //printf("  pattern bytes =");
+     //   for (size_t i = 0; i < opts->pattern_len; i++) {
+     //       printf(" %02" PRIx8, opts->pattern[i]);
+     //   }
+      //  printf("\n");
+ //  }
+
+    printf("  use packetlen      = %d\n", opts->packet_len_use);
+    if (opts->packet_len_use)
+        printf("  packetsize    = %zu\n", opts->packet_len);
+
+    printf("======================\n");
+}

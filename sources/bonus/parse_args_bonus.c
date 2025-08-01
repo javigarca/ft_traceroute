@@ -26,6 +26,9 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
 
     int i = 1;
     int hostcont = 0;
+    char flag;
+    char *val = NULL;
+    opts->port = BASE_DST_PORT;
 
     while (argv[i]) {
         if (argv[i][0] == '-') {
@@ -48,15 +51,30 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
                         case 'd': 
                             opts->debug=1;
                             break;
-                        case '?': 
-                            print_help(); 
-                            exit(EXIT_SUCCESS);
+                        case 's':
+                        case 't':
+                        case 'p':
+                        case 'i':
+                        case 'c':
+                            flag = argv[i][j];
+                            // Caso "-c123" (sin espacio)
+                            if (argv[i][j+1] != '\0') {
+                                val = &argv[i][j+1];
+                            } else {
+                                // Caso "-c 123" (espacio separado)
+                                if (i + 1 >=argc)
+                                    error_exit(EXIT_FAILURE, 0, "Option -%c requires an argument", argv[i][j]);
+                                val = argv[++i];
+                            }
+                            validate_flag_arg(val, flag, opts);
+                            // Salimos del inner-loop para no reexaminar los dígitos de "123"
+                            j = strlen(argv[i]) - 1;
+                            break;
                         default: 
                             error_exit(EXIT_FAILURE, 0, "Unknown option: -%c", argv[i][j]);
                     }
                 }
-            }
-            
+            }            
         }
         else {
             hostcont++;
@@ -110,4 +128,63 @@ int resolve_target(t_traceroute_options *opts){
 
 	freeaddrinfo(result);
 	return (0);
+}
+
+/**
+ * @brief Función para validar el argumento de las flag que aceptan un número de arg como -c e -i. Salimos con error en caso negativo
+ * 
+ * @param value valor que recibimos del argumento
+ * 
+ */
+void    validate_flag_arg(char *value, char flag, t_traceroute_options *opts){
+    errno = 0;
+    char *endptr;
+    if (flag == 'p'){
+        long port = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if ( port < 1 || port > 65535) 
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= 65535", value);
+        opts->port = (int)port;
+    }
+    /*if (flag == 'i'){
+        double interval = strtod(value, &endptr);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if (errno == ERANGE || interval <=0.0)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", value, LONG_MAX);
+        opts->interval = interval;
+    }*/
+    /*if (flag == 'p'){
+        size_t hexlen = strlen(value);
+        if (hexlen < 2 || hexlen > MAX_PATTERN_LEN*2 || hexlen%2 != 0)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s'", value);
+        opts->pattern_len = hexlen / 2; //de digitos a bytes
+        for (size_t i = 0; i < opts->pattern_len; i++) {
+            char byte_str[3] = {value[2*i], value[2*i+1], '\0'};
+            long v = strtol(byte_str, &endptr, 16);
+            if (*endptr != '\0')
+                error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+            opts->pattern[i] = (uint8_t)v;
+        }
+        opts->pattern_use = 1;
+    }*/
+    /*if (flag == 's'){
+        long sz = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if (errno == ERANGE || sz < 0 || sz > MAX_PAYLOAD_SIZE)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", value, MAX_PAYLOAD_SIZE);
+        opts->payload_size = (size_t)sz;
+        opts->payload_size_use = 1;
+    }*/
+    /*if (flag == 't'){
+        long ttl = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if (errno == ERANGE || ttl <= 0 || ttl > 255)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= 255", value);
+        opts->ttl = ttl;
+        opts->ttl_use = 1;
+    }*/
 }

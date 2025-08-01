@@ -28,5 +28,6 @@
  #define DEF_TIME_OUT_U 0
  #define UDP_HDR_LEN    8          // tamaño de la cabecera UDP, añadida por el SO
  #define BASE_DST_PORT  33434
+ #define MAX_NUM_PORT   65535
 
 #endif

@@ -28,6 +28,9 @@ typedef struct s_target {
  typedef struct s_traceroute_options {
 	int             debug;
 	const char      *host;
+    int             port;
+    size_t          packet_len;
+    int             packet_len_use;
     t_target		target;
     t_target        hop;
 	struct timeval	start_traceroute; 
@@ -51,13 +54,26 @@ typedef struct s_icmphdr {
 } t_icmphdr;
 
 /**
- * @brief Paquete completo ICMP, cabecera seguida de payload.
- * Este buffer es el que se enviará y recibirá con sendto()/recvfrom().
+ * @brief Pseudo cabecera para el calculo de checksum de UDP
+ *    El checksum UDP no sólo cubre la cabecera y los datos del propio UDP, sino también algunos campos clave de la cabecera IP para detectar errores de enrutamiento o entrega incorrecta. Como esos últimos no están físicamente dentro de la cabecera UDP, se crea la pseudo-cabecera:
+ *      saddr	    32 bits	Dirección IPv4 de origen
+ *      daddr	    32 bits	Dirección IPv4 de destino
+ *      zero	    8 bits	Un byte a cero
+ *      protocol	8 bits	El valor IPPROTO_UDP (17)
+ *      udp_length  16 bits	Longitud total del UDP (sizeof(udphdr) + payload_len)
+ *    Al incluir esta pseudo-cabecera en el cálculo:
+ *    Garantizas que el paquete ha llegado al par IP correcto (si alguien cambiase la IP de destino, el checksum fallaría).
+ *    Detectar errores en la longitud (si se pierde o duplica algún byte en la capa IP, el checksum cambia).
+ *    Proteger contra reenvíos o entregas mal dirigidas que el simple checksum UDP (sólo sobre su cabecera y datos) no cubriría.
+ *    Este mecanismo está definido en la especificación UDP (RFC 768) y en las recomendaciones de checksum de la capa IP (RFC 1071), y es obligatorio para que la verificación de integridad UDP funcione correctamente en todos los routers y sistemas finales.
  */
-typedef struct s_packet {
-	t_icmphdr   header;              // Cabecera ICMP
-	uint8_t 	payload[PAYLOAD_SIZE];   // Payload arbitrario (p.ej., timestamp o relleno)
-} t_packet;
+ typedef struct s_pseudo_hdr{ 
+    uint32_t saddr;
+    uint32_t daddr;
+    uint8_t  zero;
+    uint8_t  proto;
+    uint16_t udplen;
+}t_pseudo_hdr;
 
 #endif
 
