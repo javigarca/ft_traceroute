@@ -40,33 +40,26 @@ Arguments:
 `ft_traceroute` requires root privileges or appropriate capabilities to open a raw socket.
 
 ### Option 1: Run with `sudo`
-
-bash
+```bash
 sudo ./ft_traceroute 8.8.8.8
-
+```
 ### Option 2: Grant raw socket capability (recommended)
 ```bash
 sudo setcap cap_net_raw+ep ./ft_traceroute
 ```
-
 ## 🛠 Build
-
 ```bash
 make           # builds ./bin/ft_traceroute
 make setcap    # builds and grants raw socket capability to ./bin/ft_traceroute
 make bonus     # builds and grants capability to ./bin/ft_traceroute_bonus
 ```
-
 The executable will be located at `./bin`.
 
 ## 🚀 Run
-
 ```bash
 ./ft_traceroute [options] <hostname|IPv4> [packetlen]
 ```
-
 For help:
-
 ```bash
 ./ft_traceroute --help
 ```
