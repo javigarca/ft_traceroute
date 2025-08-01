@@ -34,9 +34,9 @@ Traceroute (aka tracert on Windows) is a utility that tracks the path IP packets
 
 ## 🔧 Arguments:
   
-  host            The host to traceroute to
+   `host`            The host to traceroute to
   
-  packetlen       Full packet length (default is header + 40). Can be increased.
+   `packetlen`       Full packet length (default is header + 40). Can be increased.
 
 ## ⚠️ Permissions
 
