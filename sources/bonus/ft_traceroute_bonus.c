@@ -70,16 +70,16 @@ int main (int argc, char **argv)
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
 
     ////impresión cabecera
-    print_infofn(1, stdout, "ft_traceroute to %s (%s) %d hops max %d bytes packets", opts.target.hostname, opts.target.ip_str, NUM_TTL, opts.packet_len);
+    print_infofn(1, stdout, "ft_traceroute to %s (%s) %d hops max %d bytes packets", opts.target.hostname, opts.target.ip_str, opts.m_ttl, opts.packet_len);
 
-    for (size_t ttl = 1; ttl <= NUM_TTL && g_interrupted == 0; ttl++){
+    for (int ttl = 1; ttl <= opts.m_ttl && g_interrupted == 0; ttl++){
         char    last_ip[INET_ADDRSTRLEN] = "";
 
          if (setsockopt(socket_send, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
             error_exit(EXIT_FAILURE, 0, "Error setting TTL: %u", ttl);
         print_infof(1, stdout, "%u ", ttl);
     
-        for (size_t probe = 0; probe < NUM_PROBES; probe++) {
+        for (int probe = 0; probe < opts.probes; probe++) {
             struct  timeval t_send, t_recv, time_out;
             double  t_rtt_ms;
             int     response = 0;

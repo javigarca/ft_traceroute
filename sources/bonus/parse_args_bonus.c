@@ -31,8 +31,10 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
     char    flag;
     char    *val = NULL;
     
-    opts->port = BASE_DST_PORT;
-    opts->packet_len = WIRE_BYTES;
+    opts->port          = BASE_DST_PORT;
+    opts->packet_len    = WIRE_BYTES;
+    opts->probes        = NUM_PROBES;
+    opts->m_ttl         = NUM_TTL;
 
     while (argv[i]) {
         if (argv[i][0] == '-') {
@@ -55,11 +57,9 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
                         case 'd': 
                             opts->debug=1;
                             break;
-                        case 's':
-                        case 't':
+                        case 'q':
+                        case 'm':                        
                         case 'p':
-                        case 'i':
-                        case 'c':
                             flag = argv[i][j];
                             // Caso "-c123" (sin espacio)
                             if (argv[i][j+1] != '\0') {
@@ -171,8 +171,25 @@ void    validate_flag_arg(char *value, char flag, t_traceroute_options *opts){
             error_exit(EXIT_FAILURE, 0, "too big packetlen %d specified", plen); 
         }        
         opts->packet_len = (int)plen;
-        opts->packet_len_use = 1;
-    }      
+    }
+    if (flag == 'q'){
+        long np = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if (errno == ERANGE || np <= 0 || np > MAX_PROBES)
+            error_exit(EXIT_FAILURE, 0, "no more than %d probes per hop", MAX_PROBES);
+        opts->probes = (int)np;
+    }   
+    if (flag == 'm'){
+        long nh = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if ( nh == 0)
+            error_exit(EXIT_FAILURE, 0, "first hops out of range");
+        if (errno == ERANGE || nh > MAX_HOPS)
+            error_exit(EXIT_FAILURE, 0, "max hops can not be more than %d ", MAX_HOPS);
+        opts->m_ttl = (int)nh;
+    }   
     /*if (flag == 'i'){
         double interval = strtod(value, &endptr);
         if (*endptr != '\0') 
@@ -195,15 +212,7 @@ void    validate_flag_arg(char *value, char flag, t_traceroute_options *opts){
         }
         opts->pattern_use = 1;
     }*/
-    /*if (flag == 's'){
-        long sz = strtol(value, &endptr, 10);
-        if (*endptr != '\0') 
-            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
-        if (errno == ERANGE || sz < 0 || sz > MAX_PAYLOAD_SIZE)
-            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", value, MAX_PAYLOAD_SIZE);
-        opts->payload_size = (size_t)sz;
-        opts->payload_size_use = 1;
-    }*/
+    
     /*if (flag == 't'){
         long ttl = strtol(value, &endptr, 10);
         if (*endptr != '\0') 

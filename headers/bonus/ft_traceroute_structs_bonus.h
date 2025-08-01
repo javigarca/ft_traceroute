@@ -30,7 +30,8 @@ typedef struct s_target {
 	const char      *host;
     int             port;
     size_t          packet_len;
-    int             packet_len_use;
+    int             probes;
+    int             m_ttl;
     t_target		target;
     t_target        hop;
 	struct timeval	start_traceroute; 

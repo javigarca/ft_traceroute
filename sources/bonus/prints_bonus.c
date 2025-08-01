@@ -14,6 +14,8 @@ void    print_help(){
     printf("Options:\n");
     printf("  -p port                     Set the destination port to use as initial udp port value for \"default\" method\n");
     printf("                              (incremented by each probe, default is 33434)\n");
+    printf("  -m max_ttl                  Set the max number of hops (max TTL to be reached). Default is 30\n");
+    printf("  -q nqueries                 Set the number of probes per each hop. Default is 3\n");
     printf("  -V  --version               Print version info and exit\n");
     printf("  --help                      Read this help and exit\n");
     printf("Arguments:\n");
@@ -133,27 +135,13 @@ void    print_summary(t_stats *stats){
  */
 void    print_opts(const t_traceroute_options *opts) {
     printf("=== Parsed options ===\n");
-    printf("  port          = %d\n", opts->port);
-    //printf("  count         = %d\n", opts->count);
-    //printf("  interval      = %.6f\n", opts->interval);
-    printf("  target host   = %s\n", opts->host ? opts->host : "(null)");
-    //printf("  route         = %d\n", opts->route);
-    //printf("  use_pattern   = %d\n", opts->pattern_use);
+    printf("  port        = %d\n", opts->port);
+    printf("  probes      = %d\n", opts->probes);
+    printf("  max_ttl     = %d\n", opts->m_ttl);
+    printf("  packetsize  = %zu\n", opts->packet_len);
+    printf("  host     = %s\n", opts->host ? opts->host : "(null)");
     //printf("  ttl           = %d\n", opts->ttl_use);
     //if (opts->ttl_use)
     //    printf("  ttl value     = %d\n", opts->ttl);
-    //if (opts->pattern_use) {
-    //    printf("  pattern_len   = %zu\n", opts->pattern_len);
-    //printf("  pattern bytes =");
-     //   for (size_t i = 0; i < opts->pattern_len; i++) {
-     //       printf(" %02" PRIx8, opts->pattern[i]);
-     //   }
-      //  printf("\n");
- //  }
-
-    printf("  use packetlen      = %d\n", opts->packet_len_use);
-    if (opts->packet_len_use)
-        printf("  packetsize    = %zu\n", opts->packet_len);
-
     printf("======================\n");
 }
