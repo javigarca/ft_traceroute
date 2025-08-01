@@ -1,12 +1,13 @@
 #ifndef FT_TRACEROUTE_STRUCTS_BONUS_H
  #define FT_TRACEROUTE_STRUCTS_BONUS_H
 
-#include <bits/types/struct_timeval.h>
+# include <bits/types/struct_timeval.h>
 # include <stdint.h>
 # include <netinet/in.h>   // struct sockaddr_in
 # include <arpa/inet.h>    // INET_ADDRSTRLEN
 # include <sys/time.h>
-# include "ft_traceroute_definitions_bonus.h"
+# include <stdbool.h>
+
 
 /**
  * @brief Información del host de destino resuelta desde el nombre o IP.
@@ -27,11 +28,11 @@ typedef struct s_target {
   */
  typedef struct s_traceroute_options {
 	int             debug;
-	const char      *host;
     int             port;
     size_t          packet_len;
     int             probes;
     int             m_ttl;
+    bool            dns;          
     t_target		target;
     t_target        hop;
 	struct timeval	start_traceroute; 
@@ -162,4 +163,12 @@ struct udphdr {
     __sum16 check;   // checksum UDP   
 };
 
+
+
+struct sockaddr_in {
+    sa_family_t    sin_family; // Tipo de dirección (siempre AF_INET para IPv4)
+    in_port_t      sin_port;   // Puerto (en **orden de red**)
+    struct in_addr sin_addr;   // Dirección IP
+    char           sin_zero[8];// Relleno para que coincida con struct sockaddr
+};
 */

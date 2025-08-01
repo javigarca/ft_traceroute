@@ -1,5 +1,6 @@
 #include <bits/types/struct_timeval.h>
 #include <errno.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,6 +75,7 @@ int main (int argc, char **argv)
 
     for (int ttl = 1; ttl <= opts.m_ttl && g_interrupted == 0; ttl++){
         char    last_ip[INET_ADDRSTRLEN] = "";
+        char    dns_host[NI_MAXHOST];
 
          if (setsockopt(socket_send, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
             error_exit(EXIT_FAILURE, 0, "Error setting TTL: %u", ttl);
@@ -113,7 +115,18 @@ int main (int argc, char **argv)
                     if (response > 0) {
                         if (strcmp(opts.hop.ip_str,last_ip) != 0){
                             strcpy(last_ip, opts.hop.ip_str);
-                            print_infof(1, stdout," %s (%s) ", last_ip, last_ip);
+                            if (!opts.dns) {
+                                print_infof(1, stdout," %s (%s) ", last_ip, last_ip);
+                            } 
+                            else {
+                                int dns_res = getnameinfo( (struct sockaddr *) &opts.hop.addr, sizeof(opts.hop.addr), dns_host, sizeof(dns_host), NULL, 0, 0);
+                                if (dns_res == 0){
+                                    print_infof(1, stdout," %s (%s) ", dns_host, last_ip);
+                                } else {
+                                    print_infof(1, stdout," %s (%s) ", last_ip, last_ip);
+                                    print_infof(opts.debug, stdout," Name Resolution failed : %d \n", dns_res);
+                                }
+                            }
                         }
                         gettimeofday(&t_recv, NULL);
                         t_rtt_ms = (t_recv.tv_sec  - t_send.tv_sec) * 1000.0 + (t_recv.tv_usec - t_send.tv_usec) / 1000.0;

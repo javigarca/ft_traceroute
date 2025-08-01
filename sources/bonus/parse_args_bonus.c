@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <unistd.h>
 #include <string.h>     // memset, strerror
 #include <netdb.h>      // getaddrinfo, freeaddrinfo, addrinfo
@@ -35,6 +36,7 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
     opts->packet_len    = WIRE_BYTES;
     opts->probes        = NUM_PROBES;
     opts->m_ttl         = NUM_TTL;
+    opts->dns           = DNS_RESOLUTION;
 
     while (argv[i]) {
         if (argv[i][0] == '-') {
@@ -56,6 +58,9 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
                             exit(EXIT_SUCCESS);
                         case 'd': 
                             opts->debug=1;
+                            break;
+                        case 'n': 
+                            opts->dns = 0;
                             break;
                         case 'q':
                         case 'm':                        
@@ -89,11 +94,6 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
             else if (pos_count == 2) {
                 // segundo posicional = packetlen
                 validate_flag_arg(argv[i], 'x', opts);
-                int plen = atoi(argv[i]);
-                if ( plen > 65500) {
-                    error_exit(EXIT_FAILURE, 0, "too big packetlen %d specified", plen); 
-                }        
-                opts->packet_len = plen;
             }
             else {
                 error_exit(EXIT_FAILURE, 0, "Extra arg `%s' (position %d, argc %d)", argv[i], pos_count, argc);

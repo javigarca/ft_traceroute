@@ -139,7 +139,10 @@ void    print_opts(const t_traceroute_options *opts) {
     printf("  probes      = %d\n", opts->probes);
     printf("  max_ttl     = %d\n", opts->m_ttl);
     printf("  packetsize  = %zu\n", opts->packet_len);
-    printf("  host     = %s\n", opts->host ? opts->host : "(null)");
+    printf("  host        = %s\n", opts->target.hostname ? opts->target.hostname : "()");
+    char *dns;
+    dns = (opts->dns) ? "ACTIVE" : "INACTIVE";
+    printf("  DNS         = %s\n", dns);
     //printf("  ttl           = %d\n", opts->ttl_use);
     //if (opts->ttl_use)
     //    printf("  ttl value     = %d\n", opts->ttl);

@@ -31,5 +31,6 @@
  #define MAX_NUM_PORT   65535
  #define MAX_PROBES     10
  #define MAX_HOPS       255
+ #define DNS_RESOLUTION 1
 
 #endif

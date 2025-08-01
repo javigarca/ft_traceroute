@@ -164,6 +164,9 @@ int receive_packet(int sockfd, uint16_t sent_seq, t_traceroute_options *opts){
         error_exit(EXIT_FAILURE, errno, "recvfrom");
     }
     inet_ntop(AF_INET, &src_addr.sin_addr, opts->hop.ip_str, sizeof(opts->hop.ip_str));
+    opts->hop.addr.sin_family = AF_INET;
+    opts->hop.addr.sin_port = 0;  
+    opts->hop.addr.sin_addr = src_addr.sin_addr;
 
     // Extraer cabeceras IP e ICMP
     struct iphdr *ip = (struct iphdr *)recv_buf;
