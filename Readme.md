@@ -22,7 +22,7 @@ Traceroute (aka tracert on Windows) is a utility that tracks the path IP packets
 - Debug output (`-d`)
 - Full packet length setting (argument)
 
-## 🔧 Options (Help Output)
+## 🔧 Options 
 
   - -p port         Set the destination port to use as initial UDP port value (incremented by each probe, default is 33434)
   - -m max_ttl      Set the max number of hops (TTL). Default is 30
@@ -32,8 +32,10 @@ Traceroute (aka tracert on Windows) is a utility that tracks the path IP packets
   - -V, --version   Print version info and exit
   - --help          Show help and exit
 
-Arguments:
+## 🔧 Arguments:
+  
   host            The host to traceroute to
+  
   packetlen       Full packet length (default is header + 40). Can be increased.
 
 ## ⚠️ Permissions
