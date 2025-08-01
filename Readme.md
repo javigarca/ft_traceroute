@@ -20,16 +20,17 @@ Traceroute (aka tracert on Windows) is a utility that tracks the path IP packets
 - Number of queries per hop (`-q`)
 - Disable reverse DNS resolution (`-n`)
 - Debug output (`-d`)
+- Full packet length setting (argument)
 
 ## 🔧 Options (Help Output)
 
-  -p port         Set the destination port to use as initial UDP port value (incremented by each probe, default is 33434)
-  -m max_ttl      Set the max number of hops (TTL). Default is 30
-  -q nqueries     Set the number of probes per hop. Default is 3
-  -n              Disable reverse DNS resolution
-  -d              Enable debug output
-  -V, --version   Print version info and exit
-  --help          Show help and exit
+  - -p port         Set the destination port to use as initial UDP port value (incremented by each probe, default is 33434)
+  - -m max_ttl      Set the max number of hops (TTL). Default is 30
+  - -q nqueries     Set the number of probes per hop. Default is 3
+  - -n              Disable reverse DNS resolution
+  - -d              Enable debug output
+  - -V, --version   Print version info and exit
+  - --help          Show help and exit
 
 Arguments:
   host            The host to traceroute to
