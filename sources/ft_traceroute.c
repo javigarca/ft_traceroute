@@ -64,7 +64,7 @@ int main (int argc, char **argv)
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
 
     ////impresión cabecera
-    print_infofn(1, stdout, "ft_traceroute to %s (%s) %d hops max %d bytes packets", opts.target.hostname, opts.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
+    print_infofn(1, stdout, "ft_traceroute to %s (%s) %d hops max %d bytes packets", opts.target.hostname, opts.target.ip_str, NUM_TTL, WIRE_BYTES);
 
     for (size_t ttl = 1; ttl <= NUM_TTL && g_interrupted == 0; ttl++){
         char    last_ip[INET_ADDRSTRLEN] = "";

@@ -28,8 +28,10 @@ int send_packet(int sockfd, t_traceroute_options *opts, uint16_t seq){
     struct sockaddr_in  destination;
     uint64_t            now;
 	ssize_t             sent_bytes;
-    char                buffer[PAYLOAD_SIZE];
     unsigned short      send_to_port = opts->port + seq;
+    int                 payload_len = opts->packet_len - IP_HEADER_LEN - ICMP_HEADER_LEN;
+    char                buffer[payload_len];
+    
 
     if (send_to_port == 0) {
         send_to_port = 1;
@@ -42,7 +44,7 @@ int send_packet(int sockfd, t_traceroute_options *opts, uint16_t seq){
 	now = ft_time_now_us();    
     memcpy(buffer, &now, sizeof(now));
     // Rellenar resto del payload
-    memset(buffer + sizeof(now), 0x42, PAYLOAD_SIZE - sizeof(now));
+    memset(buffer + sizeof(now), 0x42, payload_len - sizeof(now));
 
 	//  Enviar
 	sent_bytes = sendto(sockfd, &buffer, sizeof(buffer), 0, (struct sockaddr *)&destination, sizeof(destination));

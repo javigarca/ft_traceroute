@@ -7,6 +7,7 @@
 #include <errno.h>
 
 #include "ft_traceroute_bonus.h"
+#include "ft_traceroute_definitions_bonus.h"
 #include "ft_traceroute_structs_bonus.h"
 
 /**
@@ -24,11 +25,14 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
         exit(EXIT_SUCCESS);
     }
 
-    int i = 1;
-    int hostcont = 0;
-    char flag;
-    char *val = NULL;
+    int     i = 1;
+    int     host_count = 0;
+    int     pos_count = 0;
+    char    flag;
+    char    *val = NULL;
+    
     opts->port = BASE_DST_PORT;
+    opts->packet_len = WIRE_BYTES;
 
     while (argv[i]) {
         if (argv[i][0] == '-') {
@@ -77,17 +81,29 @@ void parse_args(int argc, char *argv[], t_traceroute_options *opts){
             }            
         }
         else {
-            hostcont++;
-            opts->target.hostname = argv[i]; 
+            pos_count++;
+            if (pos_count == 1) {
+                host_count++;
+                opts->target.hostname = argv[i];
+            }
+            else if (pos_count == 2) {
+                // segundo posicional = packetlen
+                validate_flag_arg(argv[i], 'x', opts);
+                int plen = atoi(argv[i]);
+                if ( plen > 65500) {
+                    error_exit(EXIT_FAILURE, 0, "too big packetlen %d specified", plen); 
+                }        
+                opts->packet_len = plen;
+            }
+            else {
+                error_exit(EXIT_FAILURE, 0, "Extra arg `%s' (position %d, argc %d)", argv[i], pos_count, argc);
+            }
         }
         i++;
     }
 
-    if (hostcont == 0) {
+    if (host_count == 0) {
         error_exit(EXIT_FAILURE, 0, "Specify \"host\" missing argument");
-    }
-    if (hostcont != 1) {
-        error_exit(EXIT_FAILURE, 0,"only one destination allowed");
     }
 }
 
@@ -147,6 +163,16 @@ void    validate_flag_arg(char *value, char flag, t_traceroute_options *opts){
             error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= 65535", value);
         opts->port = (int)port;
     }
+    if (flag == 'x') {
+        long plen = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if ( plen > 65500) {
+            error_exit(EXIT_FAILURE, 0, "too big packetlen %d specified", plen); 
+        }        
+        opts->packet_len = (int)plen;
+        opts->packet_len_use = 1;
+    }      
     /*if (flag == 'i'){
         double interval = strtod(value, &endptr);
         if (*endptr != '\0') 
@@ -186,5 +212,8 @@ void    validate_flag_arg(char *value, char flag, t_traceroute_options *opts){
             error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= 255", value);
         opts->ttl = ttl;
         opts->ttl_use = 1;
-    }*/
+    }
+    
+    
+    */
 }
