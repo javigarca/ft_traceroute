@@ -29,7 +29,7 @@ void    print_help(){
  * 
  */
 void    print_version(){
-    printf("(42 Urduliz Project) - ft_traceroute for Linux, version 0.8.9\n");
+    printf("(42 Urduliz Project) - ft_traceroute for Linux, version 1.0.0\n");
     printf("Copyright (c) 2025 Javier García-Arango Vázquez-Prada, License: none (All rights reserved)\n");
 }
  /**
