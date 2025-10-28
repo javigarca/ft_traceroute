@@ -15,7 +15,7 @@ void    print_help(){
     printf("  -p port                     Set the destination port to use as initial udp port value for \"default\" method\n");
     printf("                              (incremented by each probe, default is 33434)\n");
     printf("  -m max_ttl                  Set the max number of hops (max TTL to be reached). Default is 30\n");
-    printf("  -n                          Deactive DNS resolution. Active by default\n");
+    printf("  -n                          Disable DNS resolution. Enabled by default\n");
     printf("  -q nqueries                 Set the number of probes per each hop. Default is 3\n");
     printf("  -V  --version               Print version info and exit\n");
     printf("  --help                      Read this help and exit\n");
